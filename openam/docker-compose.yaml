@@ -1,0 +1,20 @@
+version: '3.7'
+
+services:
+
+  openam:
+    image: openam:7.0
+    container_name: openam
+    restart: unless-stopped
+    networks:
+      - traefik
+    volumes:
+      - './data:/data'
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.openam.rule=Host(`mysso.luxair.org`)"
+
+networks:
+  traefik:
+    external: true
+

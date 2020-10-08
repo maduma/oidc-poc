@@ -1,0 +1,30 @@
+version: "3.5"
+
+services:
+
+  traefik-forward-auth:
+    image: traefik-forward-auth:2.2.0
+    container_name: traefik-forward-auth
+    environment:
+      - AUTH_HOST=mytraefik.luxair.org
+      - SECRET=mysecret
+      #- COOKIE_NAME=iPlanetDirectoryProAcc
+      - DEFAULT_PROVIDER=oidc
+      - PROVIDERS_OIDC_ISSUER_URL=http://mysso.luxair.org/openam/oauth2
+      - PROVIDERS_OIDC_CLIENT_ID=toot
+      - PROVIDERS_OIDC_CLIENT_SECRET=thisisalongpassword
+      - INSECURE_COOKIE=true
+      - LOG_LEVEL=debug
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.traefik-forward-auth.rule=Host(`mytraefik.luxair.org`) && PathPrefix(`/_oauth`)"
+      - "traefik.http.routers.traefik-forward-auth.middlewares=traefik-forward-auth"
+      - "traefik.http.middlewares.traefik-forward-auth.forwardauth.address=http://traefik-forward-auth:4181"
+      - "traefik.http.middlewares.traefik-forward-auth.forwardauth.authResponseHeaders=X-Forwarded-User, X-Auth-Token"
+      - "traefik.http.services.traefik-forward-auth.loadbalancer.server.port=4181"
+    networks:
+      - traefik
+
+networks:
+    traefik:
+        external: true

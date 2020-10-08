@@ -1,0 +1,19 @@
+version: '3.7'
+
+services:
+
+  whoami:
+    image: containous/whoami
+    container_name: whoami
+    restart: unless-stopped
+    networks:
+      - traefik
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.whoami.rule=PathPrefix(`/whoami`)"
+      - "traefik.http.routers.whoami.middlewares=traefik-forward-auth"
+
+networks:
+  traefik:
+    external: true
+
